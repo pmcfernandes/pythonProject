@@ -11,3 +11,5 @@ from .File import *
 from .Boolean import *
 from .JSON import *
 from .RandomStr import *
+from .MailSender import *
+from .Picture import *

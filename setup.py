@@ -4,7 +4,7 @@ setup(
     name='python_utilities',
     version='1.0.1',
     packages=(find_packages()),
-    install_requires=['pymssql', 'pandas', ],
+    install_requires=['pymssql', 'pandas', 'numpy', 'opencv-python', 'matplotlib', 'pyqt5', ],
     url='https://github.com/pmcfernandes/pythonProject',
     license='',
     author='Pedro Fernandes',

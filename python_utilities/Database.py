@@ -12,11 +12,10 @@ class Database:
         self.connect()
         pass
 
-    '''
-    Connect to Database
-    '''
-
     def connect(self) -> bool:
+        """
+        Connect to Database
+        """
         try:
             self.conn = _mssql.connect(server=self.host, user=self.username, password=self.password, database=self.database)
         except _mssql.MssqlConnection as e:
@@ -28,11 +27,10 @@ class Database:
         self.conn.close()
         pass
 
-    '''
-    Execute non query
-    '''
-
     def executeNonQuery(self, sql: str, params=None) -> bool:
+        """
+        Execute non query
+        """
         try:
             if params is None:
                 self.conn.execute_non_query(sql)
@@ -43,11 +41,10 @@ class Database:
             return False
         return True
 
-    '''
-    Execute Scalar
-    '''
-
     def executeScalar(self, sql: str, params=None):
+        """
+          Execute Scalar
+        """
         result = None
         try:
             if params is None:
@@ -59,11 +56,10 @@ class Database:
             return None
         return result
 
-    '''
-    Execute data and create a iterator 
-    '''
-
     def execute(self, sql: str, params=None):
+        """
+        Execute data and create a iterator
+        """
         try:
             if params is None:
                 self.conn.execute_query(sql)

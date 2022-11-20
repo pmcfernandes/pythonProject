@@ -80,16 +80,16 @@ class SQLField:
 
 class SQLBase:
     def __init__(self):
-        self.whereClauses = []
-        self.strTableName = None
-        self.strLogicalOperator = None
+        self._whereClauses = []
+        self.__strTableName = None
+        self.__strLogicalOperator = None
         pass
 
     def getTableName(self) -> str:
-        return self.strTableName
+        return self.__strTableName
 
     def setTableName(self, name: str):
-        self.strTableName = name
+        self.__strTableName = name
         pass
 
     def _AddJoin(self, tableName: str, joinTableName: str, jointType: JoinType = JoinType.Left) -> str:
@@ -102,26 +102,26 @@ class SQLBase:
         else:
             strJoin = "LEFT"
 
-        self.strLogicalOperator = ""
+        self.__strLogicalOperator = ""
         return f"{tableName} {strJoin} JOIN {joinTableName}"
 
     def _AddOn(self, fieldName: str, value, fieldType=FieldType.Numeric, whereOperator=WhereOperator.Equal, logicalOperator=LogicalOperator.AND):
         if len(fieldName) == 0:
             pass
 
-        if len(self.strLogicalOperator) == 0:
-            self.strLogicalOperator = "ON"
+        if len(self.__strLogicalOperator) == 0:
+            self.__strLogicalOperator = "ON"
         else:
-            self.strLogicalOperator = self.__getLogicalOperator(logicalOperator)
+            self.__strLogicalOperator = self.__getLogicalOperator(logicalOperator)
 
-        self.strTableName = f"{self.strTableName} {self.strLogicalOperator} {fieldName} {self._enclose(value, fieldType, whereOperator)} "
+        self.__strTableName = f"{self.__strTableName} {self.__strLogicalOperator} {fieldName} {self._enclose(value, fieldType, whereOperator)} "
         pass
 
     def _AddWhere(self, fieldName: str, value, fieldType=FieldType.Numeric, whereOperator=WhereOperator.Equal, logicalOperator=LogicalOperator.AND, bracketType=BracketType.NoBracket):
         if len(fieldName) == 0:
             pass
 
-        self.whereClauses.append(SQLField(fieldName, value, fieldType, whereOperator, logicalOperator, bracketType))
+        self._whereClauses.append(SQLField(fieldName, value, fieldType, whereOperator, logicalOperator, bracketType))
         pass
 
     def _getFields(self, fields) -> str:
@@ -132,7 +132,7 @@ class SQLBase:
         for f in fields:
             strSQL += f"{f.fieldName}, "
 
-        return strSQL.strip()[:-1];
+        return strSQL.strip()[:-1]
 
     def _getSet(self, fields) -> str:
         if len(fields) == 0:
@@ -389,7 +389,7 @@ class SQLSelect(SQLBase):
         if len(self.__fields) == 0:
             return ""
 
-        strSQL = "SELECT {fields} FROM {tableName}{where}{groups}{orders}".format(tableName=self.getTableName(), fields=self.__getSelectFields(), where=self._getWheres(self.whereClauses), groups=self.__getGroups(), orders=self.__getOrderBys())
+        strSQL = "SELECT {fields} FROM {tableName}{where}{groups}{orders}".format(tableName=self.getTableName(), fields=self.__getSelectFields(), where=self._getWheres(self._whereClauses), groups=self.__getGroups(), orders=self.__getOrderBys())
         return strSQL
 
 
@@ -443,7 +443,7 @@ class SQLUpdate(SQLBase):
         if len(self.__fields) == 0:
             return ""
 
-        strSQL = "UPDATE {tableName} {sets}{where}".format(tableName=self.getTableName(), sets=self._getSet(self.__fields), where=self._getWheres(self.whereClauses))
+        strSQL = "UPDATE {tableName} {sets}{where}".format(tableName=self.getTableName(), sets=self._getSet(self.__fields), where=self._getWheres(self._whereClauses))
         return strSQL
 
 
@@ -454,6 +454,6 @@ class SQLDelete(SQLBase):
         pass
 
     def SQL(self) -> str:
-        strSQL = "DELETE FROM {tableName}{where}".format(tableName=self.getTableName(), where=self._getWheres(self.whereClauses))
+        strSQL = "DELETE FROM {tableName}{where}".format(tableName=self.getTableName(), where=self._getWheres(self._whereClauses))
         return strSQL
 

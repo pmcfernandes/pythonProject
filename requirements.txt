@@ -1,2 +1,6 @@
 pandas
 pymssql
+numpy
+opencv-python
+matplotlib
+pyqt5
