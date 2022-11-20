@@ -10,12 +10,12 @@ class FileWrite(Enum):
 class File:
 
     @staticmethod
-    def readFile(fileName):
+    def readFile(fileName: str) -> str:
         f = open(fileName, "r")
         return f.read()
 
     @staticmethod
-    def writeFile(fileName, content, write=FileWrite.Write):
+    def writeFile(fileName: str, content: str, write=FileWrite.Write):
         if write == FileWrite.Write:
             f = open(fileName, "w")
         else:
@@ -26,19 +26,19 @@ class File:
         pass
 
     @staticmethod
-    def delete(fileName):
+    def delete(fileName: str) -> bool:
         if os.path.exists(fileName):
             os.remove(fileName)
             return True
         return False
 
     @staticmethod
-    def createDirectory(dirName):
+    def createDirectory(dirName: str):
         os.mkdir(dirName)
         pass
 
     @staticmethod
-    def joinPaths(names):
+    def joinPaths(names) -> str:
         path = ""
         for s in names:
             path = os.path.join(path, s)

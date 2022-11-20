@@ -1,12 +1,12 @@
 from datetime import datetime
 
 
-class Dates:
+class Date:
     @staticmethod
     def now():
         return datetime.now()
 
     @staticmethod
-    def toDateTime(s):
+    def toDateTime(s: str):
         return datetime.strptime(s, '%m/%d/%y %H:%M:%S')
 

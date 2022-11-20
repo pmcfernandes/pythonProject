@@ -1,6 +1,6 @@
 from enum import Enum
 
-import Dates
+from .Date import Date
 
 
 class BracketType(Enum):
@@ -68,7 +68,7 @@ class WhereOperator(Enum):
 
 
 class SQLField:
-    def __init__(self, fieldName, value="", fieldType=FieldType.Numeric, whereOperator=WhereOperator.Equal, logicalOperator=LogicalOperator.AND, bracketType=BracketType.NoBracket):
+    def __init__(self, fieldName: str, value="", fieldType=FieldType.Numeric, whereOperator=WhereOperator.Equal, logicalOperator=LogicalOperator.AND, bracketType=BracketType.NoBracket):
         self.fieldName = fieldName
         self.value = value
         self.fieldType = fieldType
@@ -85,14 +85,14 @@ class SQLBase:
         self.strLogicalOperator = None
         pass
 
-    def getTableName(self):
+    def getTableName(self) -> str:
         return self.strTableName
 
-    def setTableName(self, name):
+    def setTableName(self, name: str):
         self.strTableName = name
         pass
 
-    def _AddJoin(self, tableName, joinTableName, jointType=JoinType.Left):
+    def _AddJoin(self, tableName: str, joinTableName: str, jointType: JoinType = JoinType.Left) -> str:
         if jointType == JoinType.Inner:
             strJoin = "INNER"
         elif jointType == JoinType.Full:
@@ -105,7 +105,7 @@ class SQLBase:
         self.strLogicalOperator = ""
         return f"{tableName} {strJoin} JOIN {joinTableName}"
 
-    def _AddOn(self, fieldName, value, fieldType=FieldType.Numeric, whereOperator=WhereOperator.Equal, logicalOperator=LogicalOperator.AND):
+    def _AddOn(self, fieldName: str, value, fieldType=FieldType.Numeric, whereOperator=WhereOperator.Equal, logicalOperator=LogicalOperator.AND):
         if len(fieldName) == 0:
             pass
 
@@ -117,14 +117,14 @@ class SQLBase:
         self.strTableName = f"{self.strTableName} {self.strLogicalOperator} {fieldName} {self._enclose(value, fieldType, whereOperator)} "
         pass
 
-    def _AddWhere(self, fieldName, value, fieldType=FieldType.Numeric, whereOperator=WhereOperator.Equal, logicalOperator=LogicalOperator.AND, bracketType=BracketType.NoBracket):
+    def _AddWhere(self, fieldName: str, value, fieldType=FieldType.Numeric, whereOperator=WhereOperator.Equal, logicalOperator=LogicalOperator.AND, bracketType=BracketType.NoBracket):
         if len(fieldName) == 0:
             pass
 
         self.whereClauses.append(SQLField(fieldName, value, fieldType, whereOperator, logicalOperator, bracketType))
         pass
 
-    def _getFields(self, fields):
+    def _getFields(self, fields) -> str:
         if len(fields) == 0:
             return ""
 
@@ -134,7 +134,7 @@ class SQLBase:
 
         return strSQL.strip()[:-1];
 
-    def _getSet(self, fields):
+    def _getSet(self, fields) -> str:
         if len(fields) == 0:
             return ""
 
@@ -146,7 +146,7 @@ class SQLBase:
 
         return strSQL.strip()[:-1]
 
-    def _getWheres(self, fields):
+    def _getWheres(self, fields) -> str:
         strSQL = ""
         if len(fields) == 0:
             return ""
@@ -172,7 +172,7 @@ class SQLBase:
 
         return strSQL
 
-    def __getWhere(self, field, logicalOperator):
+    def __getWhere(self, field: SQLField, logicalOperator: str):
         if logicalOperator != " WHERE ":
             logicalOperator = SQLBase.__getLogicalOperator(field.logicalOperator)
 
@@ -190,14 +190,14 @@ class SQLBase:
         return strSQL, logicalOperator
 
     @staticmethod
-    def __getLogicalOperator(logicalOperator):
+    def __getLogicalOperator(logicalOperator: LogicalOperator) -> str:
         if logicalOperator == LogicalOperator.AND:
             return "AND"
         elif logicalOperator == LogicalOperator.OR:
             return "OR"
 
     @staticmethod
-    def __getBracket(bracketType=BracketType):
+    def __getBracket(bracketType: BracketType) -> str:
         if bracketType == BracketType.LeftBracket:
             return "("
         elif bracketType == BracketType.RightBracket:
@@ -205,7 +205,7 @@ class SQLBase:
         else:
             return ""
 
-    def _enclose(self, value, fieldType, whereOperator):
+    def _enclose(self, value, fieldType: FieldType, whereOperator: WhereOperator) -> str:
         strEnclose = ""
 
         if value is None:
@@ -223,17 +223,17 @@ class SQLBase:
         elif whereOperator == WhereOperator.Like:
             strEnclose = f" LIKE '{value}'"
         elif whereOperator == WhereOperator.Contains:
-            strEnclose = f" LIKE '%{value}%"
+            strEnclose = f" LIKE '%{value}%'"
         elif whereOperator == WhereOperator.BeginsWith:
-            strEnclose = f" LIKE '%{value}"
+            strEnclose = f" LIKE '%{value}'"
         elif whereOperator == WhereOperator.EndsWith:
-            strEnclose = f" LIKE '%{value}"
+            strEnclose = f" LIKE '%{value}'"
         elif whereOperator == WhereOperator.NotContains:
-            strEnclose = f" NOT LIKE '%{value}%"
+            strEnclose = f" NOT LIKE '%{value}%'"
         elif whereOperator == WhereOperator.NotBeginsWith:
-            strEnclose = f" NOT LIKE '%{value}"
+            strEnclose = f" NOT LIKE '%{value}'"
         elif whereOperator == WhereOperator.NotEndsWith:
-            strEnclose = f" NOT LIKE '%{value}"
+            strEnclose = f" NOT LIKE '{value}%'"
         elif whereOperator == WhereOperator.NotLike:
             strEnclose = f" NOT LIKE '{value}'"
         elif whereOperator == WhereOperator.In or (fieldType == FieldType.Empty and whereOperator == WhereOperator.In):
@@ -259,7 +259,7 @@ class SQLBase:
 
         return strEnclose
 
-    def __encloseValues(self, value, fieldType):
+    def __encloseValues(self, value, fieldType: FieldType):
         strValue = value
 
         if fieldType == FieldType.Parameter:
@@ -282,9 +282,9 @@ class SQLBase:
 
             if fieldType == FieldType.Date:
                 try:  # try cast date time
-                    dt = Dates.toDateTime(strValue)
+                    dt = Date.toDateTime(strValue)
                 except Exception as e:
-                    dt = Dates.now()
+                    dt = Date.now()
                     print(e)
 
                 strValue = dt
@@ -308,7 +308,7 @@ class SQLBase:
 
         return strValue
 
-    def _encloseSet(self, value, fieldType):
+    def _encloseSet(self, value, fieldType: FieldType) -> str:
         if value is None:
             strEnclose = "NULL"
         else:
@@ -338,54 +338,54 @@ class SQLSelect(SQLBase):
             self.__fields.append(SQLField(f.strip()))
         pass
 
-    def AddJoin(self, tableName, joinType=JoinType.Left):
+    def AddJoin(self, tableName: str, joinType: JoinType = JoinType.Left):
         if len(tableName) == 0:
             pass
 
         self.setTableName(self._AddJoin(self.getTableName(), tableName, joinType))
         pass
 
-    def AddOn(self, fieldName, value, fieldType=FieldType.Numeric, whereOperator=WhereOperator.Equal, logicalOperator=LogicalOperator.AND):
+    def AddOn(self, fieldName: str, value, fieldType=FieldType.Numeric, whereOperator=WhereOperator.Equal, logicalOperator=LogicalOperator.AND):
         self._AddOn(fieldName, value, fieldType, whereOperator, logicalOperator)
         pass
 
-    def AddWhere(self, fieldName, value, fieldType=FieldType.Numeric, whereOperator=WhereOperator.Equal, logicalOperator=LogicalOperator.AND, bracketType=BracketType.NoBracket):
+    def AddWhere(self, fieldName: str, value, fieldType=FieldType.Numeric, whereOperator=WhereOperator.Equal, logicalOperator=LogicalOperator.AND, bracketType=BracketType.NoBracket):
         self._AddWhere(fieldName, value, fieldType, whereOperator, logicalOperator, bracketType)
         pass
 
-    def AddOrder(self, fieldName, orderBy=OrderByDirection.Asc):
+    def AddOrder(self, fieldName: str, orderBy=OrderByDirection.Asc):
         if len(fieldName) == 0:
             pass
 
         self.__orders.append(SQLField(fieldName + "ASC" if orderBy == OrderByDirection.Asc else "DESC"))
         pass
 
-    def AddGroup(self, fieldName):
+    def AddGroup(self, fieldName: str):
         if len(fieldName) == 0:
             pass
 
         self.__orders.append(SQLField(fieldName))
         pass
 
-    def __getSelectFields(self):
+    def __getSelectFields(self) -> str:
         if len(self.__fields) == 0:
             return "*"
         else:
             return self._getFields(self.__fields)
 
-    def __getOrderBys(self):
+    def __getOrderBys(self) -> str:
         if len(self.__orders) == 0:
             return ""
         else:
             return " ORDER BY {orders}".format(orders=self._getFields(self.__orders))
 
-    def __getGroups(self):
+    def __getGroups(self) -> str:
         if len(self.__groups) == 0:
             return ""
         else:
             return " GROUP BY {groups}".format(groups=self._getFields(self.__groups))
 
-    def SQL(self):
+    def SQL(self) -> str:
         if len(self.__fields) == 0:
             return ""
 
@@ -398,14 +398,14 @@ class SQLInsert(SQLBase):
         super().__init__()
         self.__fields = []
 
-    def AddValue(self, fieldName, value, fieldType=FieldType.Numeric):
+    def AddValue(self, fieldName: str, value, fieldType=FieldType.Numeric):
         if len(fieldName) == 0:
             pass
 
         self.__fields.append(SQLField(fieldName, value, fieldType))
         pass
 
-    def SQL(self):
+    def SQL(self) -> str:
         if len(self.__fields) == 0:
             return ""
 
@@ -428,18 +428,18 @@ class SQLUpdate(SQLBase):
         super().__init__()
         self.__fields = []
 
-    def AddSet(self, fieldName, value, fieldType=FieldType.Numeric):
+    def AddSet(self, fieldName: str, value, fieldType=FieldType.Numeric):
         if len(fieldName) == 0:
             pass
 
         self.__fields.append(SQLField(fieldName, value, fieldType))
         pass
 
-    def AddWhere(self, fieldName, value, fieldType=FieldType.Numeric, whereOperator=WhereOperator.Equal, logicalOperator=LogicalOperator.AND, bracketType=BracketType.NoBracket):
+    def AddWhere(self, fieldName: str, value, fieldType=FieldType.Numeric, whereOperator=WhereOperator.Equal, logicalOperator=LogicalOperator.AND, bracketType=BracketType.NoBracket):
         self._AddWhere(fieldName, value, fieldType, whereOperator, logicalOperator, bracketType)
         pass
 
-    def SQL(self):
+    def SQL(self) -> str:
         if len(self.__fields) == 0:
             return ""
 
@@ -449,11 +449,11 @@ class SQLUpdate(SQLBase):
 
 class SQLDelete(SQLBase):
 
-    def AddWhere(self, fieldName, value, fieldType=FieldType.Numeric, whereOperator=WhereOperator.Equal, logicalOperator=LogicalOperator.AND, bracketType=BracketType.NoBracket):
+    def AddWhere(self, fieldName: str, value, fieldType=FieldType.Numeric, whereOperator=WhereOperator.Equal, logicalOperator=LogicalOperator.AND, bracketType=BracketType.NoBracket):
         self._AddWhere(fieldName, value, fieldType, whereOperator, logicalOperator, bracketType)
         pass
 
-    def SQL(self):
+    def SQL(self) -> str:
         strSQL = "DELETE FROM {tableName}{where}".format(tableName=self.getTableName(), where=self._getWheres(self.whereClauses))
         return strSQL
 
