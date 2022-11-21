@@ -13,3 +13,5 @@ from .JSON import *
 from .RandomStr import *
 from .MailSender import *
 from .Picture import *
+from .QrCode import *
+

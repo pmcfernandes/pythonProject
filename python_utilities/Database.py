@@ -1,14 +1,15 @@
 from pymssql import _mssql
+import pymssql
 import pandas as pd
 
 
 class Database:
     def __init__(self, host: str, username: str, password: str, database: str):
-        self.conn = None
-        self.host = host
-        self.username = username
-        self.password = password
-        self.database = database
+        self.__conn = None
+        self.__host = host
+        self.__username = username
+        self.__password = password
+        self.__database = database
         self.connect()
         pass
 
@@ -17,15 +18,23 @@ class Database:
         Connect to Database
         """
         try:
-            self.conn = _mssql.connect(server=self.host, user=self.username, password=self.password, database=self.database)
+            self.__conn = _mssql.connect(server=self.__host, user=self.__username, password=self.__password, database=self.__database)
         except _mssql.MssqlConnection as e:
             print(e)
             return False
         return True
 
     def close(self):
-        self.conn.close()
+        self.__conn.close()
         pass
+
+    def createCursor(self):
+        """
+        Create a cursor to free use of data
+        """
+        con = pymssql.connect(server=self.__host, user=self.__username, password=self.__password, database=self.__database)
+        cur = con.cursor()
+        return cur, con
 
     def executeNonQuery(self, sql: str, params=None) -> bool:
         """
@@ -33,9 +42,9 @@ class Database:
         """
         try:
             if params is None:
-                self.conn.execute_non_query(sql)
+                self.__conn.execute_non_query(sql)
             else:
-                self.conn.execute_non_query(sql, params)
+                self.__conn.execute_non_query(sql, params)
         except _mssql.MssqlDatabaseException as e:
             print(e)
             return False
@@ -43,14 +52,13 @@ class Database:
 
     def executeScalar(self, sql: str, params=None):
         """
-          Execute Scalar
+        Execute Scalar
         """
-        result = None
         try:
             if params is None:
-                result = self.conn.execute_scalar(sql);
+                result = self.__conn.execute_scalar(sql);
             else:
-                result = self.conn.execute_scalar(sql, params)
+                result = self.__conn.execute_scalar(sql, params)
         except _mssql.MssqlDatabaseException as e:
             print(e)
             return None
@@ -62,24 +70,24 @@ class Database:
         """
         try:
             if params is None:
-                self.conn.execute_query(sql)
+                self.__conn.execute_query(sql)
             else:
-                self.conn.execute_query(sql, params)
+                self.__conn.execute_query(sql, params)
         except _mssql.MssqlDatabaseException as e:
             print(e)
             return None
-        return self.conn
+        return self.__conn
 
 
 class DataFrame:
     def __init__(self, conn):
-        self.conn = conn
+        self.__conn = conn
         pass
 
     def createDataFrame(self, columns):
         data = []
 
-        for row in self.conn:
+        for row in self.__conn:
             data.append(row)
 
         df = pd.DataFrame(data, columns=columns)

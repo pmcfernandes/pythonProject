@@ -20,6 +20,30 @@ class Picture:
         plt.show()
         pass
 
+    @staticmethod
+    def startVideoCapture(outputFilename, width: int = 640, height: int = 480):
+        cap = cv.VideoCapture(0)
+        fourcc = cv.VideoWriter_fourcc(*'XVID')
+        out = cv.VideoWriter(outputFilename, fourcc, 20.0, (width, height))
+        return out, cap
+
+    @staticmethod
+    def releaseVideoCapture(cap, out):
+        cap.release()
+        out.release()
+        cv.destroyAllWindows()
+        pass
+
+    @staticmethod
+    def readCapture(cap, out=None):
+        _, frame = cap.read()
+        gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+
+        if out is not None:
+            out.write(frame)
+
+        return frame, gray
+
     def __loadImage(self, fileName: str):
         self.__img = cv.imread(fileName, cv.IMREAD_UNCHANGED)
         pass

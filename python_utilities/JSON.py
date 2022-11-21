@@ -1,4 +1,5 @@
 import json
+import pandas as pd
 
 
 def loadJSONFromFile(fileName: str):
@@ -23,3 +24,14 @@ def isValidJSON(json_str: str) -> bool:
     except ValueError:
         return False
     return True
+
+
+def jsonToDataFrame(data, column):
+    df = pd.DataFrame.from_records(data)
+
+    rows = []
+    for index, row in df[column].iteritems():
+        for item in row:
+            rows.append(item)
+    df = pd.DataFrame(rows)
+    return df

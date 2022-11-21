@@ -43,6 +43,7 @@ class MailSender:
         try:
             smtp = SMTP(host, port)
             smtp.ehlo()
+
             if port == 587:
                 smtp.starttls(context=context)
                 smtp.ehlo()

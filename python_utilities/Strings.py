@@ -17,3 +17,8 @@ class Strings:
     @staticmethod
     def trimEnd(s: str) -> str:
         return s.rstrip()
+
+    @staticmethod
+    def slugify(s: str):
+        return s.replace(r'\W+', '-', regex=True)
+    
