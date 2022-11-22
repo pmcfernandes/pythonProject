@@ -14,4 +14,5 @@ from .RandomStr import *
 from .MailSender import *
 from .Picture import *
 from .QrCode import *
+from .Strings import *
 

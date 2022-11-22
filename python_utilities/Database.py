@@ -1,6 +1,5 @@
 from pymssql import _mssql
 import pymssql
-import pandas as pd
 
 
 class Database:
@@ -33,8 +32,20 @@ class Database:
         Create a cursor to free use of data
         """
         con = pymssql.connect(server=self.__host, user=self.__username, password=self.__password, database=self.__database)
-        cur = con.cursor()
+        cur = con.cursor(as_dict=True)
         return cur, con
+
+    def fetchCursor(self, sql: str) -> dict:
+        cur, con = self.createCursor()
+
+        try:
+            cur.execute(sql)
+            data = cur.fetchall()
+        except:
+            return []
+        finally:
+            con.close()
+        return data
 
     def executeNonQuery(self, sql: str, params=None) -> bool:
         """
@@ -77,20 +88,5 @@ class Database:
             print(e)
             return None
         return self.__conn
-
-
-class DataFrame:
-    def __init__(self, conn):
-        self.__conn = conn
-        pass
-
-    def createDataFrame(self, columns):
-        data = []
-
-        for row in self.__conn:
-            data.append(row)
-
-        df = pd.DataFrame(data, columns=columns)
-        return df
 
 
