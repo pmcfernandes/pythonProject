@@ -10,9 +10,10 @@ from .Date import *
 from .File import *
 from .Boolean import *
 from .JSON import *
-from .RandomStr import *
+from .Utilities import *
 from .MailSender import *
 from .Picture import *
 from .QrCode import *
 from .Strings import *
+from .DataSet import *
 

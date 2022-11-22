@@ -1,4 +1,6 @@
+import shutil
 from enum import Enum
+from shutil import copytree
 import os
 
 
@@ -34,7 +36,12 @@ class File:
 
     @staticmethod
     def createDirectory(dirName: str):
-        os.mkdir(dirName)
+        os.mkdir(dirName, exist_ok=True)
+        pass
+
+    @staticmethod
+    def copyDir(srcDir: str, destDir: str):
+        shutil.copytree(srcDir, destDir)
         pass
 
     @staticmethod
@@ -43,7 +50,3 @@ class File:
         for s in names:
             path = os.path.join(path, s)
         return path
-
-
-
-
